@@ -1,0 +1,13 @@
+﻿
+
+<h2>Calender</h2>
+<CalenderTable @bind-Date="_date"></CalenderTable>
+<span>clicked Date is <b>@($"{_date:dd/MM/yyyy}")</b></span>
+<button @onclick="() => _date = DateTime.Today">set to Today</button>
+
+
+
+@code {
+
+    DateTime _date = DateTime.Today.AddMonths(-2);
+}

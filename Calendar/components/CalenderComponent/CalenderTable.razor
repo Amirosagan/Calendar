@@ -1,0 +1,100 @@
+﻿
+<table class="calendar w-auto h-auto">
+    <thead>
+
+        <tr>
+            <th class="p-1">
+                <button @onclick="PreviousMonth" class="btn btn-sm btn-danger">@("<<")</button>
+            </th>
+            <th class="p-1 text-center" colspan="5">@($"{calendarStartDay:MMMM, yyyy}")</th>
+            <th class="p-1">
+                <button @onclick="NextMonth" class="btn btn-sm btn-danger">@(">>")</button>
+            </th>
+        </tr>
+        <tr>
+            <th class="text-info p-1">SUN</th>
+            <th class="text-info p-1">MON</th>
+            <th class="text-info p-1">TUE</th>
+            <th class="text-info p-1">WED</th>
+            <th class="text-info p-1">THU</th>
+            <th class="text-info p-1">FRI</th>
+            <th class="text-info p-1">SAT</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int w = 0; w < 6; w++)
+        {
+            <tr>
+                @for (int d = 0; d < 7; d++)
+                {
+                    var day = startDay.AddDays(w * 7 + d);
+                    var dayString = $"{day:dd}";
+                    var dayClass = (day == DateTime.Today) ? "font-weight-bold btn-primary" : "";
+                    var selectedClass = (day == Date) ? "bg-peimary" : "";
+
+                    @if (day.Month == calendarStartDay.Month)
+                    {
+                        <td class="p-1 text-center">
+                            <button class="btn btn-sm btn-outline-primary  @dayClass @selectedClass" @onclick="()=>SelectDay(day)">@dayString</button>
+                        </td>
+                    }
+                    else
+                    {
+                       <td class="text-black-50 p-1 text-center" >@dayString</td>
+                    }
+
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+    DateTime startDay;
+    DateTime calendarStartDay;
+
+
+    [Parameter]
+    public DateTime Date { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> DateChanged { get; set; }
+
+    void ChangeMonthe(DateTime date)
+    {
+        calendarStartDay = new DateTime(date.Year, date.Month, 1);
+
+        startDay = calendarStartDay.AddDays( (int)calendarStartDay.DayOfWeek * -1);
+    }
+
+    protected override void OnParametersSet()
+    {
+
+        ChangeMonthe(Date);
+
+        base.OnParametersSet();
+    }
+
+    public void NextMonth()
+    {
+        ChangeMonthe(calendarStartDay.AddMonths(1));
+    }
+
+    public void PreviousMonth()
+    {
+        ChangeMonthe(calendarStartDay.AddMonths(-1));
+    }
+
+     Task SelectDay(DateTime date)
+    {
+        this.Date = date;
+        return DateChanged.InvokeAsync(date);
+    }
+
+
+
+
+}
